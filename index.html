@@ -85,35 +85,36 @@
   </div>
 
   <script>
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyaXdxJaGxhgtcNPCmg5nt7FMNWV5nQPnCQ7fg9wbCrKQZId35W-NgKOdaIzkag48oy/exec';
+
     window.onload = function() {
+      // 1. Nếu chạy trong môi trường Google Apps Script
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
           .withSuccessHandler(renderMenu)
-          .withFailureHandler(function(error) {
-            const container = document.getElementById('content');
-            document.getElementById('loading').style.display = 'none';
-            container.innerHTML = `
-              <div class="alert alert-danger text-center p-4 shadow-sm" style="border-radius: 20px;">
-                <p class="mb-0">
-                  <strong>❌ Lỗi kết nối Script</strong><br>
-                  ${error.message}<br>
-                  Vui lòng kiểm tra quyền truy cập Sheet hoặc API Key.
-                </p>
-              </div>`;
-          })
+          .withFailureHandler(showError)
           .getTodayMenu();
-      } else {
-        const container = document.getElementById('content');
-        document.getElementById('loading').style.display = 'none';
-        container.innerHTML = `
-          <div class="alert alert-warning text-center p-4 shadow-sm" style="border-radius: 20px;">
-            <p class="mb-0">
-              <strong>⚠️ Chế độ xem trước (Static Preview)</strong><br>
-              Trang web này đang chạy ở chế độ tĩnh. Để xem dữ liệu thật từ Google Sheets, bạn hãy truy cập đường link Web App chính thức từ Google Apps Script.
-            </p>
-          </div>`;
+      } 
+      // 2. Nếu chạy trong môi trường GitHub Pages (Dùng Fetch API)
+      else {
+        fetch(`${WEB_APP_URL}?api=1`)
+          .then(response => response.json())
+          .then(data => renderMenu(data))
+          .catch(err => showError({message: "Không thể kết nối API. Hãy đảm bảo Web App đã được Deploy ở chế độ 'Anyone'."}));
       }
     };
+
+    function showError(error) {
+      const container = document.getElementById('content');
+      document.getElementById('loading').style.display = 'none';
+      container.innerHTML = `
+        <div class="alert alert-danger text-center p-4 shadow-sm" style="border-radius: 20px;">
+          <p class="mb-0">
+            <strong>❌ Lỗi kết nối dữ liệu</strong><br>
+            ${error.message}
+          </p>
+        </div>`;
+    }
 
     function renderMenu(menus) {
       const container = document.getElementById('content');

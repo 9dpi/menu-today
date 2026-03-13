@@ -8,7 +8,15 @@ const DEEPSEEK_API_KEY = 'YOUR_DEEPSEEK_API_KEY'; // Thay thế bằng API Key c
 /**
  * Hàm khởi tạo Web App
  */
-function doGet() {
+function doGet(e) {
+  // Nếu có tham số ?api=1 thì trả về JSON (Dùng cho GitHub Pages)
+  if (e && e.parameter && e.parameter.api) {
+    const data = getTodayMenu();
+    return ContentService.createTextOutput(JSON.stringify(data))
+        .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  // Mặc định trả về giao diện HTML (Dùng cho Web App link)
   return HtmlService.createTemplateFromFile('index')
       .evaluate()
       .setTitle('Menu Today - Admin Dashboard')
