@@ -53,41 +53,49 @@ function getTodayMenu() {
 function generateDailyContent() {
   const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
   
-  const systemPrompt = "Bạn là một chuyên gia ẩm thực Việt Nam lão luyện.";
+  const systemPrompt = "Bạn là một chuyên gia ẩm thực Việt Nam lão luyện. Bạn luôn trả về kết quả dưới dạng JSON thuần túy, không có văn bản giải thích.";
   const userPrompt = `
     Hãy tạo thực đơn cho ngày hôm nay bao gồm 1 bữa Trưa (Lunch) và 1 bữa Tối (Dinner).
-    Yêu cầu cho mỗi bữa:
-    1. Menu_Items: Danh sách 3 món ăn Việt Nam truyền thống hoặc hiện đại phổ biến, dễ làm.
-    2. Prompt_Video: Câu lệnh chi tiết bằng tiếng Anh để tạo video/ảnh món ăn theo phong cách cinematic photography, high-end food style.
-    3. TikTok_Title: Tiêu đề giật gân, thu hút (Hook).
-    4. Description: Mô tả ngắn gọn, hấp dẫn về thực đơn.
-    5. Hashtags: Bộ 5-10 hashtag tối ưu (ví dụ: #menutoday #vietnamesefood #comnha...).
+    Yêu cầu: Trả về một JSON Object có key là "data", chứa mảng 2 đối tượng (Lunch và Dinner).
+    Mỗi đối tượng có các key: 
+    - "type": "Lunch" hoặc "Dinner"
+    - "menu": "Tên 3 món ăn"
+    - "prompt": "Câu lệnh tiếng Anh tạo video"
+    - "title": "Tiêu đề TikTok"
+    - "desc": "Mô tả bữa ăn"
+    - "tags": "Chuỗi hashtag cách nhau bởi dấu cách, ví dụ: '#monngon #comnha'"
 
-    TRẢ VỀ KẾT QUẢ DUY NHẤT DƯỚI DẠNG JSON MẢNG có 2 đối tượng (Lunch và Dinner) với các key: type, menu, prompt, title, desc, tags. 
-    Không thêm văn bản giải thích.
+    Lưu ý quan trọng: Tất cả giá trị phải nằm trong dấu ngoặc kép. Không sử dụng ký tự lạ làm hỏng cấu trúc JSON.
   `;
 
   try {
     const response = callDeepSeekAI(systemPrompt, userPrompt);
-    // DeepSeek đôi khi trả về markdown code block, cần lọc bỏ
+    // Loại bỏ markdown code blocks nếu có
     const cleanJson = response.replace(/```json|```/g, '').trim();
-    const content = JSON.parse(cleanJson);
-
-    content.forEach(item => {
-      const newRow = [
-        new Date(), 
-        item.type, // "Lunch" hoặc "Dinner"
-        item.menu, 
-        item.prompt, 
-        item.title, 
-        item.desc, 
-        item.tags, 
-        "Pending"
-      ];
-      sheet.appendRow(newRow);
-    });
+    const result = JSON.parse(cleanJson);
     
-    Logger.log("Đã tạo thực đơn thành công với DeepSeek!");
+    // Xử lý cả trường hợp trả về trực tiếp mảng hoặc object bọc mảng
+    const content = result.data || result;
+
+    if (Array.isArray(content)) {
+      content.forEach(item => {
+        const newRow = [
+          new Date(), 
+          item.type, 
+          item.menu, 
+          item.prompt, 
+          item.title, 
+          item.desc, 
+          item.tags, 
+          "Pending"
+        ];
+        sheet.appendRow(newRow);
+      });
+      Logger.log("Đã tạo thực đơn thành công với DeepSeek!");
+    } else {
+      throw new Error("Kết quả AI không phải là mảng hoặc không chứa key 'data'");
+    }
+    
   } catch (e) {
     Logger.log("Lỗi khi gọi AI hoặc lưu dữ liệu: " + e.message);
   }
