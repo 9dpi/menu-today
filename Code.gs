@@ -21,28 +21,26 @@ function doGet() {
  */
 function getTodayMenu() {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_NAME);
+  const sheet = ss.getSheetByName(SHEET_NAME) || ss.getSheets()[0]; // Lấy sheet đầu tiên nếu không tìm thấy tên
   const data = sheet.getDataRange().getValues();
   
-  // Lấy múi giờ của Spreadsheet để đồng bộ
+  if (data.length === 0) return [];
+
   const tz = ss.getSpreadsheetTimeZone();
   const today = Utilities.formatDate(new Date(), tz, "dd/MM/yyyy");
   
-  console.log("Đang tìm thực đơn cho ngày: " + today + " (Tz: " + tz + ")");
-
-  // Lấy tất cả dữ liệu trừ header
-  const rows = data.slice(1);
+  // Xác định xem hàng 1 là Header hay Data
+  // Nếu hàng 1, cột 1 là kiểu ngày tháng, thì đó là Data
+  const startRow = (data[0][0] instanceof Date || !isNaN(Date.parse(data[0][0]))) ? 0 : 1;
+  const rows = data.slice(startRow);
   
+  console.log("Tổng số hàng dữ liệu:", rows.length);
+
   const todayRows = rows.filter(row => {
     if (!row[0]) return false;
     try {
       let rowDate = row[0];
-      // Nếu không phải là đối tượng Date, thử convert
-      if (!(rowDate instanceof Date)) {
-        rowDate = new Date(rowDate);
-      }
-      
-      // Kiểm tra xem date có hợp lệ không
+      if (!(rowDate instanceof Date)) rowDate = new Date(rowDate);
       if (isNaN(rowDate.getTime())) return false;
       
       const rowDateStr = Utilities.formatDate(rowDate, tz, "dd/MM/yyyy");
@@ -52,10 +50,10 @@ function getTodayMenu() {
     }
   });
   
-  console.log("Số lượng hàng tìm thấy cho hôm nay: " + todayRows.length);
-  
-  // Nếu không tìm thấy hàng nào cho "hôm nay", thử lấy 2 hàng cuối cùng làm dự phòng
+  // Nếu tìm thấy thực đơn hôm nay thì trả về, nếu không lấy 2 hàng cuối cùng (mới nhất)
   const finalRows = todayRows.length > 0 ? todayRows : rows.slice(-2);
+  
+  console.log("Số lượng hàng hiển thị:", finalRows.length);
 
   return finalRows.map(row => ({
     date: row[0],
