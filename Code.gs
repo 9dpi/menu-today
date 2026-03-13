@@ -105,7 +105,7 @@ function generateDailyContent() {
     - "menu": "Tên 3 món ăn theo cấu trúc Mặn - Xào - Canh"
     - "prompt": "Detailed English prompt for high-end cinematic food video, ALWAYS include '--ar 9:16' at the end for TikTok ratio"
     - "title": "Tiêu đề TikTok hấp dẫn về bữa cơm gia đình"
-    - "desc": "Mô tả ngắn gọn hương vị mâm cơm"
+    - "desc": "Mô tả ngắn gọn hương vị mâm cơm, cuối câu LUÔN thêm 1 câu hook kêu gọi follow kênh để xem menu mỗi ngày"
     - "tags": "#comnha #menutoday #mamcomgiadinh #onhaanngon"
     - "price": "Ước tính chi phí cho 4 người ăn (ví dụ: 150.000 VNĐ)"
     - "time": "Thời gian nấu ước tính (ví dụ: 45 phút)"
