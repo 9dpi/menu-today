@@ -53,19 +53,20 @@ function getTodayMenu() {
 function generateDailyContent() {
   const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
   
-  const systemPrompt = "Bạn là một chuyên gia ẩm thực Việt Nam lão luyện. Bạn luôn trả về kết quả dưới dạng JSON thuần túy, không có văn bản giải thích.";
+  const systemPrompt = "Bạn là một chuyên gia ẩm thực Việt Nam, am hiểu sâu sắc về mâm cơm gia đình truyền thống.";
   const userPrompt = `
-    Hãy tạo thực đơn cho ngày hôm nay bao gồm 1 bữa Trưa (Lunch) và 1 bữa Tối (Dinner).
-    Yêu cầu: Trả về một JSON Object có key là "data", chứa mảng 2 đối tượng (Lunch và Dinner).
+    Hãy thiết lập thực đơn cho ngày hôm nay bao gồm 1 bữa Trưa (Lunch) và 1 bữa Tối (Dinner).
+    Yêu cầu quan trọng: Mỗi bữa phải là một mâm cơm gia đình Việt Nam hoàn chỉnh gồm 3 món: 01 món mặn (kho/rang/ram), 01 món xào hoặc rau luộc, và 01 món canh.
+    Ví dụ: "Thịt kho tàu, Đậu cô ve xào, Canh bí nấu tôm".
+
+    Trả về một JSON Object có key là "data", chứa mảng 2 đối tượng (Lunch và Dinner).
     Mỗi đối tượng có các key: 
     - "type": "Lunch" hoặc "Dinner"
-    - "menu": "Tên 3 món ăn"
-    - "prompt": "Câu lệnh tiếng Anh tạo video"
-    - "title": "Tiêu đề TikTok"
-    - "desc": "Mô tả bữa ăn"
-    - "tags": "Chuỗi hashtag cách nhau bởi dấu cách, ví dụ: '#monngon #comnha'"
-
-    Lưu ý quan trọng: Tất cả giá trị phải nằm trong dấu ngoặc kép. Không sử dụng ký tự lạ làm hỏng cấu trúc JSON.
+    - "menu": "Tên 3 món ăn theo cấu trúc Mặn - Xào - Canh"
+    - "prompt": "Detailed English prompt for high-end cinematic food video of this 3-dish meal set"
+    - "title": "Tiêu đề TikTok hấp dẫn về bữa cơm gia đình"
+    - "desc": "Mô tả ngắn gọn hương vị mâm cơm"
+    - "tags": "#comnha #menutoday #mamcomgiadinh #onhaanngon"
   `;
 
   try {

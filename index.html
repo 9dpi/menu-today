@@ -86,15 +86,18 @@
 
   <script>
     window.onload = function() {
-      if (typeof google !== 'undefined') {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(renderMenu).getTodayMenu();
       } else {
-        // Mock data for testing local interface
-        const mockData = [
-          {type: 'Lunch', status: 'Pending', menu: '1. Cơm sườn, 2. Canh chua, 3. Rau muống', prompt: 'Cinematic food photography of Vietnamese broken rice...', title: 'Trưa nay ăn gì?', desc: 'Bữa trưa đậm chất Việt', tags: '#lunch #vietnamesefood'},
-          {type: 'Dinner', status: 'Pending', menu: '1. Cá kho tộ, 2. Bát canh cua, 3. Cà pháo', prompt: 'Deep moody lighting of fish in clay pot...', title: 'Cơm tối ấm cúng', desc: 'Bữa tối cho cả gia đình', tags: '#dinner #family'}
-        ];
-        setTimeout(() => renderMenu(mockData), 1000);
+        const container = document.getElementById('content');
+        document.getElementById('loading').style.display = 'none';
+        container.innerHTML = `
+          <div class="alert alert-warning text-center p-4 shadow-sm" style="border-radius: 20px;">
+            <p class="mb-0">
+              <strong>⚠️ Chế độ xem trước (Static Preview)</strong><br>
+              Trang web này đang chạy ở chế độ tĩnh. Để xem dữ liệu thật từ Google Sheets, bạn hãy truy cập đường link Web App chính thức từ Google Apps Script.
+            </p>
+          </div>`;
       }
     };
 
