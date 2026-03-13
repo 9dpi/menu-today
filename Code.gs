@@ -103,7 +103,7 @@ function generateDailyContent() {
     Mỗi đối tượng có các key: 
     - "type": "Lunch" hoặc "Dinner"
     - "menu": "Tên 3 món ăn theo cấu trúc Mặn - Xào - Canh"
-    - "prompt": "Detailed English prompt for high-end cinematic food video of this 3-dish meal set"
+    - "prompt": "Detailed English prompt for high-end cinematic food video, ALWAYS include '--ar 9:16' at the end for TikTok ratio"
     - "title": "Tiêu đề TikTok hấp dẫn về bữa cơm gia đình"
     - "desc": "Mô tả ngắn gọn hương vị mâm cơm"
     - "tags": "#comnha #menutoday #mamcomgiadinh #onhaanngon"
