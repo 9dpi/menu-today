@@ -20,54 +20,54 @@ function doGet() {
  * Hàm lấy dữ liệu thực đơn ngày hôm nay để show lên Web App
  */
 function getTodayMenu() {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_NAME) || ss.getSheets()[0]; // Lấy sheet đầu tiên nếu không tìm thấy tên
-  const data = sheet.getDataRange().getValues();
-  
-  if (data.length === 0) return [];
-
-  const tz = ss.getSpreadsheetTimeZone();
-  const today = Utilities.formatDate(new Date(), tz, "dd/MM/yyyy");
-  
-  // Xác định xem hàng 1 là Header hay Data
-  // Nếu hàng 1, cột 1 là kiểu ngày tháng, thì đó là Data
-  const startRow = (data[0][0] instanceof Date || !isNaN(Date.parse(data[0][0]))) ? 0 : 1;
-  const rows = data.slice(startRow);
-  
-  console.log("Tổng số hàng dữ liệu:", rows.length);
-
-  const todayRows = rows.filter(row => {
-    if (!row[0]) return false;
-    try {
-      let rowDate = row[0];
-      if (!(rowDate instanceof Date)) rowDate = new Date(rowDate);
-      if (isNaN(rowDate.getTime())) return false;
-      
-      const rowDateStr = Utilities.formatDate(rowDate, tz, "dd/MM/yyyy");
-      return rowDateStr === today;
-    } catch (e) {
-      return false;
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(SHEET_NAME) || ss.getSheets()[0];
+    const data = sheet.getDataRange().getValues();
+    
+    if (!data || data.length < 1) {
+      console.log("Sheet không có dữ liệu");
+      return [];
     }
-  });
-  
-  // Nếu tìm thấy thực đơn hôm nay thì trả về, nếu không lấy 2 hàng cuối cùng (mới nhất)
-  const finalRows = todayRows.length > 0 ? todayRows : rows.slice(-2);
-  
-  console.log("Số lượng hàng hiển thị:", finalRows.length);
 
-  return finalRows.map(row => ({
-    date: row[0],
-    type: row[1],
-    menu: row[2],
-    prompt: row[3],
-    title: row[4],
-    desc: row[5],
-    tags: row[6],
-    status: row[7],
-    price: row[8] || "Đang cập nhật",
-    time: row[9] || "30-45 phút",
-    instructions: row[10] || "Chưa có hướng dẫn"
-  }));
+    const tz = ss.getSpreadsheetTimeZone();
+    const todayStr = Utilities.formatDate(new Date(), tz, "dd/MM/yyyy");
+    
+    // Tìm hàng dữ liệu (bỏ qua header nếu hàng 1 không phải là ngày)
+    let startRow = 0;
+    if (data[0][0] && !(data[0][0] instanceof Date) && isNaN(Date.parse(data[0][0]))) {
+      startRow = 1;
+    }
+    const rows = data.slice(startRow);
+    
+    // Lọc theo ngày hôm nay
+    let todayRows = rows.filter(row => {
+      if (!row[0]) return false;
+      try {
+        let d = (row[0] instanceof Date) ? row[0] : new Date(row[0]);
+        return Utilities.formatDate(d, tz, "dd/MM/yyyy") === todayStr;
+      } catch (e) { return false; }
+    });
+
+    // Fallback: Nếu không thấy ngày hôm nay, lấy 2 hàng cuối cùng
+    let results = todayRows.length > 0 ? todayRows : rows.slice(-2);
+    
+    return results.map(row => ({
+      type: row[1] || "Lunch",
+      menu: row[2] || "Chưa có món",
+      prompt: row[3] || "",
+      title: row[4] || "Hôm nay ăn gì?",
+      desc: row[5] || "",
+      tags: row[6] || "",
+      status: row[7] || "Pending",
+      price: row[8] || "Đang cập nhật",
+      time: row[9] || "Đang tính...",
+      instructions: row[10] || "Đang cập nhật hướng dẫn..."
+    }));
+  } catch (error) {
+    console.error("Lỗi getTodayMenu: " + error.toString());
+    throw new Error("Lỗi hệ thống: " + error.message);
+  }
 }
 
 /**

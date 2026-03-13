@@ -87,7 +87,21 @@
   <script>
     window.onload = function() {
       if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(renderMenu).getTodayMenu();
+        google.script.run
+          .withSuccessHandler(renderMenu)
+          .withFailureHandler(function(error) {
+            const container = document.getElementById('content');
+            document.getElementById('loading').style.display = 'none';
+            container.innerHTML = `
+              <div class="alert alert-danger text-center p-4 shadow-sm" style="border-radius: 20px;">
+                <p class="mb-0">
+                  <strong>❌ Lỗi kết nối Script</strong><br>
+                  ${error.message}<br>
+                  Vui lòng kiểm tra quyền truy cập Sheet hoặc API Key.
+                </p>
+              </div>`;
+          })
+          .getTodayMenu();
       } else {
         const container = document.getElementById('content');
         document.getElementById('loading').style.display = 'none';
