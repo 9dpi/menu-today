@@ -152,7 +152,9 @@ function generateDailyContent() {
  * Hàm phụ trợ gọi API DeepSeek (OpenAI-compatible)
  */
 function callDeepSeekAI(systemContent, userContent) {
-  const url = "https://api.deepseek.com/chat/completions";
+  const url = "https://api.deepseek.com/v1/chat/completions";
+  const maxRetries = 3;
+  let attempt = 0;
   
   const payload = {
     "model": "deepseek-chat",
@@ -161,9 +163,7 @@ function callDeepSeekAI(systemContent, userContent) {
       {"role": "user", "content": userContent}
     ],
     "stream": false,
-    "response_format": {
-      "type": "json_object"
-    }
+    "response_format": { "type": "json_object" }
   };
 
   const options = {
@@ -176,14 +176,28 @@ function callDeepSeekAI(systemContent, userContent) {
     "muteHttpExceptions": true
   };
 
-  const response = UrlFetchApp.fetch(url, options);
-  const responseCode = response.getResponseCode();
-  const responseText = response.getContentText();
-  
-  if (responseCode !== 200) {
-    throw new Error(`DeepSeek API Error (${responseCode}): ${responseText}`);
+  while (attempt < maxRetries) {
+    try {
+      const response = UrlFetchApp.fetch(url, options);
+      const responseCode = response.getResponseCode();
+      const responseText = response.getContentText();
+      
+      if (responseCode === 200) {
+        const json = JSON.parse(responseText);
+        return json.choices[0].message.content;
+      } else {
+        console.warn(`DeepSeek Attempt ${attempt + 1} failed: ${responseCode} - ${responseText}`);
+      }
+    } catch (err) {
+      console.warn(`DeepSeek Attempt ${attempt + 1} Error: ${err.message}`);
+    }
+    
+    attempt++;
+    if (attempt < maxRetries) {
+      console.log("Đang thử lại sau 3 giây...");
+      Utilities.sleep(3000); // Đợi 3 giây trước khi thử lại
+    }
   }
-
-  const json = JSON.parse(responseText);
-  return json.choices[0].message.content;
+  
+  throw new Error("Không thể kết nối tới DeepSeek API sau " + maxRetries + " lần thử. Vui lòng kiểm tra lại server DeepSeek hoặc mạng.");
 }
