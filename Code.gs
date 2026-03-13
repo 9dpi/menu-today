@@ -96,20 +96,27 @@ function generateDailyContent() {
   const systemPrompt = "Bạn là một chuyên gia ẩm thực Việt Nam, am hiểu sâu sắc về mâm cơm gia đình truyền thống.";
   const userPrompt = `
     Hãy thiết lập thực đơn cho ngày hôm nay bao gồm 1 bữa Trưa (Lunch) và 1 bữa Tối (Dinner).
-    Yêu cầu quan trọng: Mỗi bữa phải là một mâm cơm gia đình Việt Nam hoàn chỉnh gồm 3 món: 01 món mặn (kho/rang/ram), 01 món xào hoặc rau luộc, và 01 món canh.
-    Ví dụ: "Thịt kho tàu, Đậu cô ve xào, Canh bí nấu tôm".
+    
+    Yêu cầu đặc thù cho từng bữa:
+    1. Bữa Trưa (Lunch): Tập trung vào rau xanh, các món thanh đạm, tươi mát. Mâm cơm phải mang lại cảm giác nhẹ nhàng, dễ tiêu. Hình ảnh gợi ý (prompt) phải thể hiện được sự xanh mát, ánh sáng tự nhiên.
+    2. Bữa Tối (Dinner): Phải đầy đặn, ấm cúng, mâm cơm gia đình đông đủ. Gồm nhiều món hơn (ít nhất 3-4 món trở lên). Hình ảnh gợi ý (prompt) mang tông màu ấm, ánh đèn vàng, khói tỏa.
+
+    Yêu cầu chung về nội dung TikTok:
+    - Title: Tiêu đề giật gân, khơi gợi tò mò.
+    - Description: Ngoài mô tả hương vị, LUÔN thêm 1 câu hỏi ngược để khán giả trả lời (ví dụ: "Nhà bạn hôm nay ăn món gì?", "Món này ăn với cà pháo hay dưa muối thì ngon hơn nhỉ?") và 1 câu hook follow kênh.
+    - TikTok Ratio: LUÔN thêm '--ar 9:16' vào cuối prompt video.
 
     Trả về một JSON Object có key là "data", chứa mảng 2 đối tượng (Lunch và Dinner).
     Mỗi đối tượng có các key: 
     - "type": "Lunch" hoặc "Dinner"
-    - "menu": "Tên 3 món ăn theo cấu trúc Mặn - Xào - Canh"
-    - "prompt": "Detailed English prompt for high-end cinematic food video, ALWAYS include '--ar 9:16' at the end for TikTok ratio"
-    - "title": "Tiêu đề TikTok hấp dẫn về bữa cơm gia đình"
-    - "desc": "Mô tả ngắn gọn hương vị mâm cơm, cuối câu LUÔN thêm 1 câu hook kêu gọi follow kênh để xem menu mỗi ngày"
+    - "menu": "Danh sách các món ăn (Mâm cơm Việt)"
+    - "prompt": "Detailed English prompt for high-end cinematic food video (TikTok ratio --ar 9:16)"
+    - "title": "Tiêu đề TikTok"
+    - "desc": "Mô tả + Câu hỏi tương tác + Hook follow"
     - "tags": "#comnha #menutoday #mamcomgiadinh #onhaanngon"
-    - "price": "Ước tính chi phí cho 4 người ăn (ví dụ: 150.000 VNĐ)"
-    - "time": "Thời gian nấu ước tính (ví dụ: 45 phút)"
-    - "instructions": "Cách nấu tóm tắt từng bước cho 3 món (ngắn gọn để đọc nhanh)"
+    - "price": "Ước tính chi phí"
+    - "time": "Thời gian nấu"
+    - "instructions": "Cách nấu tóm tắt"
   `;
 
   try {
