@@ -42,7 +42,10 @@ function getTodayMenu() {
     title: row[4],
     desc: row[5],
     tags: row[6],
-    status: row[7]
+    status: row[7],
+    price: row[8] || "Đang cập nhật",
+    time: row[9] || "30-45 phút",
+    instructions: row[10] || "Chưa có hướng dẫn"
   }));
 }
 
@@ -67,6 +70,9 @@ function generateDailyContent() {
     - "title": "Tiêu đề TikTok hấp dẫn về bữa cơm gia đình"
     - "desc": "Mô tả ngắn gọn hương vị mâm cơm"
     - "tags": "#comnha #menutoday #mamcomgiadinh #onhaanngon"
+    - "price": "Ước tính chi phí cho 4 người ăn (ví dụ: 150.000 VNĐ)"
+    - "time": "Thời gian nấu ước tính (ví dụ: 45 phút)"
+    - "instructions": "Cách nấu tóm tắt từng bước cho 3 món (ngắn gọn để đọc nhanh)"
   `;
 
   try {
@@ -88,7 +94,10 @@ function generateDailyContent() {
           item.title, 
           item.desc, 
           item.tags, 
-          "Pending"
+          "Pending",
+          item.price,
+          item.time,
+          item.instructions
         ];
         sheet.appendRow(newRow);
       });

@@ -129,14 +129,25 @@
               </span>
             </div>
             
-            <div class="mb-3">
-              <span class="label-small">Thực đơn đề xuất</span>
-              <div class="p-3 bg-light rounded-3 border" style="font-size: 1.1rem; border-left: 4px solid var(--primary-color) !important;">
-                ${item.menu}
+            <div class="mb-4">
+              <span class="label-small">Mâm cơm gia đình đề xuất</span>
+              <div class="p-3 bg-light rounded-3 border" style="font-size: 1.2rem; border-left: 5px solid var(--primary-color) !important;">
+                <strong>${item.menu}</strong>
+                <div class="mt-2 d-flex gap-3" style="font-size: 0.9rem; color: #57606f;">
+                  <span>💰 ${item.price}</span>
+                  <span>⏱️ ${item.time}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <span class="label-small">Cách nấu tóm tắt</span>
+              <div class="p-3 bg-white border rounded-3" style="font-size: 0.95rem; line-height: 1.6; background-color: #fffaf0 !important;">
+                ${item.instructions.replace(/\n/g, '<br>')}
               </div>
             </div>
             
-            <div class="mb-3">
+            <div class="mb-4">
               <label class="label-small">Prompt tạo Video/Ảnh (AI)</label>
               <div class="input-group">
                 <input type="text" class="form-control" value="${item.prompt}" readonly id="p-${index}">
