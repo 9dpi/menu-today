@@ -9,11 +9,18 @@ const DEEPSEEK_API_KEY = 'YOUR_DEEPSEEK_API_KEY'; // Thay thế bằng API Key c
  * Hàm khởi tạo Web App
  */
 function doGet(e) {
+  console.log("doGet called with parameters: " + JSON.stringify(e ? e.parameter : "none"));
+  
   // Nếu có tham số ?api=1 thì trả về JSON (Dùng cho GitHub Pages)
   if (e && e.parameter && e.parameter.api) {
-    const data = getTodayMenu();
-    return ContentService.createTextOutput(JSON.stringify(data))
-        .setMimeType(ContentService.MimeType.JSON);
+    try {
+      const data = getTodayMenu();
+      return ContentService.createTextOutput(JSON.stringify(data))
+          .setMimeType(ContentService.MimeType.JSON);
+    } catch (err) {
+      return ContentService.createTextOutput(JSON.stringify({error: err.message}))
+          .setMimeType(ContentService.MimeType.JSON);
+    }
   }
   
   // Mặc định trả về giao diện HTML (Dùng cho Web App link)
@@ -83,7 +90,8 @@ function getTodayMenu() {
  * Hoàn thiện: Tích hợp AI DeepSeek để tìm kiếm/tạo thực đơn Việt Nam phong phú
  */
 function generateDailyContent() {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME) || ss.getSheets()[0];
   
   const systemPrompt = "Bạn là một chuyên gia ẩm thực Việt Nam, am hiểu sâu sắc về mâm cơm gia đình truyền thống.";
   const userPrompt = `
